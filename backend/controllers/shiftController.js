@@ -3,7 +3,22 @@ const User = require("../models/User");
 
 // Create micro-shift
 const createShift = async (req, res) => {
-  const { title, description, date, startTime, endTime } = req.body;
+  const { 
+    title, 
+    description, 
+    date, 
+    startTime, 
+    endTime, 
+    department, 
+    paymentRate,
+    requiredSpecializations,
+    requiredCertifications,
+    minimumExperience,
+    urgencyLevel,
+    bonusAmount,
+    hospitalNotes
+  } = req.body;
+  
   const shift = await Shift.create({
     hospital: req.user._id,
     title, 
@@ -11,6 +26,14 @@ const createShift = async (req, res) => {
     date,
     startTime,
     endTime,
+    department: department || "General",
+    paymentRate: paymentRate || 40,
+    requiredSpecializations: requiredSpecializations || [],
+    requiredCertifications: requiredCertifications || [],
+    minimumExperience: minimumExperience || 0,
+    urgencyLevel: urgencyLevel || "medium",
+    bonusAmount: bonusAmount || 0,
+    hospitalNotes
   });
   res.status(201).json(shift);
 };
@@ -57,8 +80,17 @@ const applyShift = async (req, res) => {
   const shift = await Shift.findById(req.params.id);
   if (!shift) return res.status(404).json({ message: "Shift not found" });
 
-  if (!shift.nursesApplied.includes(req.user._id)) {
-    shift.nursesApplied.push(req.user._id);
+  // Check if nurse already applied
+  const alreadyApplied = shift.nursesApplied.some(
+    application => application.nurse.toString() === req.user._id.toString()
+  );
+  
+  if (!alreadyApplied) {
+    shift.nursesApplied.push({
+      nurse: req.user._id,
+      appliedAt: new Date(),
+      message: req.body.message || ""
+    });
   }
 
   await shift.save();
@@ -70,10 +102,12 @@ const assignNurse = async (req, res) => {
   const shift = await Shift.findById(req.params.id);
   if (!shift) return res.status(404).json({ message: "Shift not found" });
 
-  const nextNurse = req.body.nurseId || shift.nursesApplied[0];
-  if (!nextNurse) return res.status(400).json({ message: "No nurse in queue" });
+  const nurseId = req.body.nurseId || (shift.nursesApplied[0] && shift.nursesApplied[0].nurse);
+  if (!nurseId) return res.status(400).json({ message: "No nurse in queue" });
 
-  shift.nurseAssigned = nextNurse;
+  shift.nurseAssigned = nurseId;
+  shift.assignedAt = new Date();
+  shift.status = "assigned";
   await shift.save();
   res.json(shift);
 };
@@ -83,10 +117,17 @@ const cancelAssignment = async (req, res) => {
   const shift = await Shift.findById(req.params.id);
   if (!shift) return res.status(404).json({ message: "Shift not found" });
 
-  const index = shift.nursesApplied.indexOf(shift.nurseAssigned);
+  // Remove current assigned nurse from applications
+  const index = shift.nursesApplied.findIndex(
+    application => application.nurse.toString() === shift.nurseAssigned.toString()
+  );
   if (index > -1) shift.nursesApplied.splice(index, 1);
 
-  shift.nurseAssigned = shift.nursesApplied[0] || null;
+  // Auto-assign next nurse in queue
+  shift.nurseAssigned = shift.nursesApplied[0] ? shift.nursesApplied[0].nurse : null;
+  shift.status = shift.nurseAssigned ? "assigned" : "open";
+  shift.assignedAt = shift.nurseAssigned ? new Date() : null;
+  
   await shift.save();
   res.json(shift);
 };
@@ -94,7 +135,7 @@ const cancelAssignment = async (req, res) => {
 // View queue for shift
 const viewQueue = async (req, res) => {
   const shift = await Shift.findById(req.params.id)
-    .populate("nursesApplied", "name email");
+    .populate("nursesApplied.nurse", "name email nurseProfile.specializations nurseProfile.rating");
 
   if (!shift) return res.status(404).json({ message: "Shift not found" });
   res.json(shift.nursesApplied);
