@@ -11,6 +11,7 @@ const shiftRoutes = require("./routes/shiftRoutes");
 const surgeRoutes = require("./routes/surgeRoutes");
 const locationRoutes = require("./routes/locationRoutes");
 const ratingRoutes = require("./routes/ratingRoutes");
+const errorHandler = require("./src/middleware/error");
 
 dotenv.config();
 connectDB();
@@ -28,9 +29,8 @@ app.use("/api/surge", surgeRoutes);
 app.use("/api/location", locationRoutes);
 app.use("/api/ratings", ratingRoutes);
 
-// Health check
 app.get("/", (req, res) => res.send("API running"));
+app.use(errorHandler);
 
-// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
