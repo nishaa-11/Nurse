@@ -1,8 +1,6 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
 const connectDB = require("./config/db");
-
-// Import all models
 const User = require("./models/User");
 const Shift = require("./models/Shift");
 const Rating = require("./models/Rating");
@@ -14,10 +12,9 @@ const EmergencyRequest = require("./models/EmergencyRequest");
 const seed = async () => {
   try {
     await connectDB();
-    console.log("🔄 Starting database seeding...");
+    console.log("Starting database seeding...");
 
-    // Clear all existing data
-    console.log("🗑️ Clearing existing data...");
+    await User.deleteMany({});
     await User.deleteMany({});
     await Shift.deleteMany({});
     await Rating.deleteMany({});
@@ -25,17 +22,15 @@ const seed = async () => {
     await Payment.deleteMany({});
     await Availability.deleteMany({});
     await EmergencyRequest.deleteMany({});
-    console.log("✅ Existing data cleared!");
 
-    // Create sample hospitals with enhanced profiles
-    console.log("🏥 Creating hospitals...");
+    console.log("Creating hospitals...");
     const hospital1 = await User.create({
       name: "City General Hospital",
       email: "admin@cityhospital.com",
       password: "hospital123",
       phone: "+1-555-0101",
       role: "hospital",
-      location: { type: "Point", coordinates: [-74.006, 40.7128] }, // New York
+      location: { type: "Point", coordinates: [-74.006, 40.7128] },
       address: {
         street: "123 Medical Center Dr",
         city: "New York",
@@ -69,7 +64,7 @@ const seed = async () => {
       password: "hospital123",
       phone: "+1-555-0201",
       role: "hospital",
-      location: { type: "Point", coordinates: [-118.2437, 34.0522] }, // Los Angeles
+      location: { type: "Point", coordinates: [-118.2437, 34.0522] },
       address: {
         street: "456 Healthcare Blvd",
         city: "Los Angeles",
@@ -97,15 +92,14 @@ const seed = async () => {
       }
     });
 
-    // Create sample nurses with enhanced profiles
-    console.log("👩‍⚕️ Creating nurses...");
+    console.log("Creating nurses...");
     const nurse1 = await User.create({
       name: "Emily Chen",
       email: "emily.chen@email.com",
       password: "nurse123",
       phone: "+1-555-0301",
       role: "nurse",
-      location: { type: "Point", coordinates: [-74.0060, 40.7589] }, // Manhattan
+      location: { type: "Point", coordinates: [-74.0060, 40.7589] },
       address: {
         street: "789 Nurse Ave",
         city: "New York",
@@ -181,7 +175,7 @@ const seed = async () => {
       password: "nurse123",
       phone: "+1-555-0501",
       role: "nurse",
-      location: { type: "Point", coordinates: [-118.2500, 34.0600] }, // LA
+      location: { type: "Point", coordinates: [-118.2500, 34.0600] },
       address: {
         street: "654 Medical Plaza",
         city: "Los Angeles",
@@ -213,13 +207,12 @@ const seed = async () => {
       }
     });
 
-    // Create sample shifts with enhanced details
-    console.log("📋 Creating shifts...");
+    console.log("Creating shifts...");
     const shift1 = await Shift.create({
       hospital: hospital1._id,
       title: "ICU Day Shift - Critical Care",
       description: "Intensive care unit day shift requiring experienced nurse for post-surgical patients",
-      date: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
+      date: new Date(Date.now() + 24 * 60 * 60 * 1000),
       startTime: "07:00",
       endTime: "19:00",
       duration: 12,
@@ -265,7 +258,7 @@ const seed = async () => {
       hospital: hospital2._id,
       title: "Pediatric Day Shift",
       description: "Caring for pediatric patients in medical/surgical unit",
-      date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // Day after tomorrow
+      date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
       startTime: "07:00",
       endTime: "15:00",
       duration: 8,
@@ -286,7 +279,6 @@ const seed = async () => {
       hospitalNotes: "Ages 2-16, mostly routine care and medication administration"
     });
 
-    // Add applications to shifts
     shift1.nursesApplied.push({
       nurse: nurse1._id,
       appliedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
@@ -302,8 +294,7 @@ const seed = async () => {
     await shift1.save();
     await shift2.save();
 
-    // Create availability records
-    console.log("📅 Creating availability records...");
+    console.log("Creating availability records...");
     await Availability.create({
       nurse: nurse1._id,
       weeklySchedule: {
@@ -331,8 +322,7 @@ const seed = async () => {
       emergencyContactHours: 2
     });
 
-    // Create sample ratings
-    console.log("⭐ Creating ratings...");
+    console.log("Creating ratings...");
     const rating1 = await Rating.create({
       shift: shift3._id,
       nurse: nurse3._id,
@@ -353,17 +343,16 @@ const seed = async () => {
       verified: true
     });
 
-    // Create sample payments
-    console.log("💰 Creating payments...");
+    console.log("Creating payments...");
     await Payment.create({
       shift: shift3._id,
       hospital: hospital2._id,
       nurse: nurse3._id,
-      baseAmount: 352, // 8 hours * $44
+      baseAmount: 352,
       surgeAmount: 0,
       bonusAmount: 0,
       totalAmount: 352,
-      platformFee: 17.6, // 5%
+      platformFee: 17.6,
       status: "completed",
       paymentMethod: "stripe",
       transactionId: `txn_${Date.now()}`,
@@ -372,8 +361,7 @@ const seed = async () => {
       notes: "Payment for pediatric day shift"
     });
 
-    // Create sample notifications
-    console.log("🔔 Creating notifications...");
+    console.log("Creating notifications...");
     await Notification.create({
       recipient: nurse1._id,
       sender: hospital1._id,
@@ -394,8 +382,7 @@ const seed = async () => {
       priority: "medium"
     });
 
-    // Create sample emergency request
-    console.log("🚨 Creating emergency request...");
+    console.log("Creating emergency request...");
     await EmergencyRequest.create({
       hospital: hospital1._id,
       urgencyLevel: "critical",
@@ -406,7 +393,7 @@ const seed = async () => {
       requiredCertifications: ["BLS", "ACLS", "TNCC"],
       minimumExperience: 2,
       nursesNeeded: 1,
-      neededBy: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now
+      neededBy: new Date(Date.now() + 30 * 60 * 1000),
       startTime: new Date().toTimeString().slice(0, 5),
       emergencyRate: 75,
       bonusAmount: 100,
@@ -417,12 +404,12 @@ const seed = async () => {
       },
       additionalNotes: "Multi-vehicle accident, expect 3-4 critical patients",
       status: "active",
-      expiresAt: new Date(Date.now() + 6 * 60 * 60 * 1000) // Expires in 6 hours
+      expiresAt: new Date(Date.now() + 6 * 60 * 60 * 1000)
     });
 
-    console.log("🎉 Seed data created successfully!");
+    console.log("Seed data created successfully!");
     console.log(`
-📊 Created:
+Created:
 - 2 Hospitals
 - 3 Nurses  
 - 3 Shifts
@@ -434,11 +421,10 @@ const seed = async () => {
     `);
 
   } catch (error) {
-    console.error("❌ Error seeding database:", error);
+    console.error("Error seeding database:", error);
   } finally {
     mongoose.connection.close();
   }
 };
 
-// Run the seed function
 seed();

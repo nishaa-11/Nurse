@@ -41,7 +41,7 @@ const createShift = async (req, res) => {
 // List all shifts (Surge mode shifts first)
 const listShifts = async (req, res) => {
   const shifts = await Shift.find()
-    .sort({ surge: -1, createdAt: -1 })   // ⭐ Surge shifts appear first
+    .sort({ surge: -1, createdAt: -1 })
     .populate("hospital", "name email")
     .populate("nurseAssigned", "name email");
 
