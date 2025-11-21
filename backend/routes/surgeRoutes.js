@@ -3,7 +3,7 @@ const router = express.Router();
 const { protect } = require("../middleware/authMiddleware");
 const { activateSurge, deactivateSurge } = require("../controllers/surgeController");
 
-router.post("/activate", protect, activateSurge);
-router.post("/deactivate", protect, deactivateSurge);
+router.post("/activate", activateSurge);
+router.post("/deactivate", deactivateSurge);
 
 module.exports = router;
