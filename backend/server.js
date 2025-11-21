@@ -11,7 +11,7 @@ const shiftRoutes = require("./routes/shiftRoutes");
 const surgeRoutes = require("./routes/surgeRoutes");
 const locationRoutes = require("./routes/locationRoutes");
 const ratingRoutes = require("./routes/ratingRoutes");
-const errorHandler = require("./src/middleware/error");
+const errorHandler = require("./middleware/error");
 
 dotenv.config();
 connectDB();
