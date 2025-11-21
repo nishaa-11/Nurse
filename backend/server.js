@@ -29,7 +29,7 @@ app.use("/api/surge", surgeRoutes);
 app.use("/api/location", locationRoutes);
 app.use("/api/ratings", ratingRoutes);
 
-app.get("/", (req, res) => res.send("API running"));
+app.get("/", (req, res) => res.send("🚀 ShiftNow API - Ready for Hackathon!"));
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
