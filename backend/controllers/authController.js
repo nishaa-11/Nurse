@@ -5,14 +5,32 @@ const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expires
 
 const registerUser = async (req, res) => {
   const { name, email, password, role, location } = req.body;
-  if (!name || !email || !password || !role) return res.status(400).json({ message: "All fields required" });
+  if (!name || !email || !password || !role) 
+      return res.status(400).json({ message: "All fields required" });
 
   const exists = await User.findOne({ email });
-  if (exists) return res.status(400).json({ message: "User exists" });
+  if (exists) 
+      return res.status(400).json({ message: "User exists" });
 
-  const user = await User.create({ name, email, password, role, location });
-  res.status(201).json({ ...user._doc, token: generateToken(user._id), password: undefined });
+  // Auto-verify hospital accounts
+  const isVerified = role === "hospital" ? true : false;
+
+  const user = await User.create({ 
+    name, 
+    email, 
+    password, 
+    role, 
+    location,
+    verified: isVerified
+  });
+
+  res.status(201).json({ 
+    ...user._doc, 
+    token: generateToken(user._id), 
+    password: undefined 
+  });
 };
+
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;

@@ -6,7 +6,7 @@ const createShift = async (req, res) => {
   const { title, description, date, startTime, endTime } = req.body;
   const shift = await Shift.create({
     hospital: req.user._id,
-    title,
+    title, 
     description,
     date,
     startTime,
@@ -15,9 +15,13 @@ const createShift = async (req, res) => {
   res.status(201).json(shift);
 };
 
-// List all shifts
+// List all shifts (Surge mode shifts first)
 const listShifts = async (req, res) => {
-  const shifts = await Shift.find().populate("hospital", "name email").populate("nurseAssigned", "name email");
+  const shifts = await Shift.find()
+    .sort({ surge: -1, createdAt: -1 })   // ⭐ Surge shifts appear first
+    .populate("hospital", "name email")
+    .populate("nurseAssigned", "name email");
+
   res.json(shifts);
 };
 
@@ -34,6 +38,7 @@ const getShift = async (req, res) => {
 const updateShift = async (req, res) => {
   const shift = await Shift.findById(req.params.id);
   if (!shift) return res.status(404).json({ message: "Shift not found" });
+
   Object.assign(shift, req.body);
   await shift.save();
   res.json(shift);
@@ -51,7 +56,11 @@ const cancelShift = async (req, res) => {
 const applyShift = async (req, res) => {
   const shift = await Shift.findById(req.params.id);
   if (!shift) return res.status(404).json({ message: "Shift not found" });
-  if (!shift.nursesApplied.includes(req.user._id)) shift.nursesApplied.push(req.user._id);
+
+  if (!shift.nursesApplied.includes(req.user._id)) {
+    shift.nursesApplied.push(req.user._id);
+  }
+
   await shift.save();
   res.json(shift);
 };
@@ -84,9 +93,21 @@ const cancelAssignment = async (req, res) => {
 
 // View queue for shift
 const viewQueue = async (req, res) => {
-  const shift = await Shift.findById(req.params.id).populate("nursesApplied", "name email");
+  const shift = await Shift.findById(req.params.id)
+    .populate("nursesApplied", "name email");
+
   if (!shift) return res.status(404).json({ message: "Shift not found" });
   res.json(shift.nursesApplied);
 };
 
-module.exports = { createShift, listShifts, getShift, updateShift, cancelShift, applyShift, assignNurse, cancelAssignment, viewQueue };
+module.exports = {
+  createShift,
+  listShifts,
+  getShift,
+  updateShift,
+  cancelShift,
+  applyShift,
+  assignNurse,
+  cancelAssignment,
+  viewQueue,
+};

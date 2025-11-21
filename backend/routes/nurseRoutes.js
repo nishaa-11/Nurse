@@ -4,8 +4,8 @@ const { protect } = require("../middleware/authMiddleware");
 const { listNurses, getNurse, updateNurse, verifyNurse } = require("../controllers/nurseController");
 
 router.get("/",  listNurses);
-router.get("/:id",  getNurse);
-router.put("/:id",  updateNurse);
-router.post("/:id/verify",  verifyNurse);
+router.get("/:id", protect, getNurse);
+router.put("/:id", protect, updateNurse);
+router.post("/:id/verify", protect, verifyNurse);
 
 module.exports = router;
