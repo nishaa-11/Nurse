@@ -1,0 +1,53 @@
+.hospital-page-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #eef2ff;
+}
+
+.hospital-card {
+  width: 380px;
+  padding: 30px;
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0px 6px 25px rgba(0,0,0,0.12);
+  text-align: center;
+}
+
+.hospital-title {
+  margin-bottom: 8px;
+  font-size: 26px;
+  color: #1e3a8a;
+}
+
+.subtitle {
+  margin-bottom: 20px;
+  color: #64748b;
+}
+
+.input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border-radius: 12px;
+  font-size: 16px;
+  color: white;
+  background: #2563eb;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}

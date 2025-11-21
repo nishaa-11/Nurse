@@ -1,0 +1,91 @@
+/* src/App.css - simple clean desktop styles */
+
+:root {
+  --bg: #eef2f7;
+  --card: #ffffff;
+  --accent: #2563eb;
+  --muted: #6b7280;
+  --border: #e6e9ef;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: var(--bg);
+  color: #111827;
+}
+
+.ui-wrap { display: flex; min-height: 100vh; }
+
+/* sidebar */
+.ui-sidebar {
+  width: 260px;
+  padding: 20px;
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.brand { font-weight: 700; font-size: 18px; }
+.side-block { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; }
+.side-title { font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom:8px; }
+
+/* main */
+.ui-main { flex: 1; padding: 22px; }
+.main-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+.main-header h1 { margin:0; font-size:18px; }
+.muted { color: var(--muted); font-size:13px; }
+
+.grid-row { display:flex; gap:16px; }
+.card {
+  background: var(--card);
+  padding: 14px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(13, 19, 35, 0.06);
+  border: 1px solid var(--border);
+  width: 100%;
+}
+
+.input {
+  padding: 10px 12px;
+  border: 1px solid #e6e9ef;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.btn {
+  padding: 10px 14px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.btn:hover { filter: brightness(0.95); }
+
+.btn-primary { background: var(--accent); border-radius: 8px; padding: 10px 14px; color: white; }
+.btn-outline {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: white;
+  cursor: pointer;
+}
+.btn-ghost {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: transparent;
+  color: white;
+  border: 1px dashed rgba(255,255,255,0.08);
+  cursor: pointer;
+}
+
+.list-item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom: 1px dashed #f1f5f9; }
+.item-title { font-weight:600; }
+.note { background:#fff7ed; padding:10px; border-radius:8px; margin-bottom:8px; border-left:4px solid #f59e0b; }
+
+.user-name { font-weight:700; font-size:15px; margin-bottom:6px; }
