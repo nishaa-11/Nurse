@@ -1,0 +1,45 @@
+.nurse-page-container {
+  height: 100vh;
+  background: #f1f5f9;
+  padding: 30px;
+}
+
+.nurse-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.nurse-header h1 {
+  color: #0f172a;
+  margin: 0;
+}
+
+.header-msg {
+  color: #475569;
+  margin-top: 6px;
+}
+
+.notif-box {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0px 6px 25px rgba(0,0,0,0.08);
+  min-height: 300px;
+}
+
+.notif-item {
+  background: #fff7ed;
+  border-left: 5px solid #f59e0b;
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.empty {
+  text-align: center;
+  color: #94a3b8;
+  margin-top: 20px;
+}
