@@ -127,14 +127,24 @@ const Home = () => {
           <p className="text-xl text-gray-300 mb-8">
             Join thousands of healthcare professionals already using ShiftNow
           </p>
-          {!isAuthenticated && (
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {!isAuthenticated && (
+              <Link
+                to="/register"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+              >
+                Start Your Journey Today
+              </Link>
+            )}
+            
+            {/* Development/Testing Link */}
             <Link
-              to="/register"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+              to="/auth-test"
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg text-sm font-medium transition-colors border border-gray-300"
             >
-              Start Your Journey Today
+              🔧 Test Authentication
             </Link>
-          )}
+          </div>
         </div>
       </div>
     </div>

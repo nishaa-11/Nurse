@@ -8,8 +8,17 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = async () => {
-    await logout();
-    navigate('/');
+    try {
+      console.log('Navbar: Logging out user:', user?.name);
+      await logout();
+      console.log('Navbar: Logout successful, redirecting to home');
+      navigate('/');
+      setIsMenuOpen(false); // Close mobile menu
+    } catch (error) {
+      console.error('Navbar: Logout error:', error);
+      // Force navigation even if logout fails
+      navigate('/');
+    }
   };
 
   return (
@@ -44,6 +53,11 @@ const Navbar = () => {
                 >
                   Dashboard
                 </Link>
+                {user?.role === 'hospital' && (
+                  <Link to="/create-shift" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                    Create Shift
+                  </Link>
+                )}
                 <Link to="/profile" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                   Profile
                 </Link>
@@ -104,6 +118,11 @@ const Navbar = () => {
                 >
                   Dashboard
                 </Link>
+                {user?.role === 'hospital' && (
+                  <Link to="/create-shift" className="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">
+                    Create Shift
+                  </Link>
+                )}
                 <Link to="/profile" className="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">
                   Profile
                 </Link>

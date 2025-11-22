@@ -30,7 +30,7 @@ const Register = () => {
     }
   });
   const [showPassword, setShowPassword] = useState(false);
-  const { register, loading, error, clearError } = useAuth();
+  const { register, loading, error, success, clearError, clearSuccess } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {

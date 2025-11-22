@@ -7,7 +7,8 @@ const initialState = {
   user: null,
   isAuthenticated: false,
   loading: true,
-  error: null
+  error: null,
+  success: null
 };
 
 const authReducer = (state, action) => {
@@ -37,6 +38,14 @@ const authReducer = (state, action) => {
       return {
         ...state,
         error: action.payload,
+        loading: false,
+        success: null
+      };
+    case 'SET_SUCCESS':
+      return {
+        ...state,
+        success: action.payload,
+        error: null,
         loading: false
       };
     case 'UPDATE_USER':
@@ -56,9 +65,14 @@ export const AuthProvider = ({ children }) => {
     const initAuth = async () => {
       try {
         const user = authService.getCurrentUser();
+        const token = authService.getToken();
+        console.log('AuthContext - Initializing auth:', { user: !!user, token: !!token });
+        
         if (user && authService.isAuthenticated()) {
+          console.log('AuthContext - User authenticated:', user);
           dispatch({ type: 'LOGIN_SUCCESS', payload: user });
         } else {
+          console.log('AuthContext - No valid authentication found');
           dispatch({ type: 'SET_LOADING', payload: false });
         }
       } catch (error) {
@@ -73,11 +87,16 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
+      console.log('AuthContext: Starting login with:', credentials.email);
       const user = await authService.login(credentials);
+      console.log('AuthContext: Login successful:', user);
       dispatch({ type: 'LOGIN_SUCCESS', payload: user });
+      dispatch({ type: 'SET_SUCCESS', payload: 'Login successful! Welcome back.' });
       return user;
     } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: error.response?.data?.message || 'Login failed' });
+      console.error('AuthContext: Login failed:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Login failed. Please try again.';
+      dispatch({ type: 'SET_ERROR', payload: errorMessage });
       throw error;
     }
   };
@@ -120,13 +139,29 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: 'SET_ERROR', payload: null });
   };
 
+  const clearSuccess = () => {
+    dispatch({ type: 'SET_SUCCESS', payload: null });
+  };
+
+  const clearMessages = () => {
+    dispatch({ type: 'SET_ERROR', payload: null });
+    dispatch({ type: 'SET_SUCCESS', payload: null });
+  };
+
+  const checkAuthentication = () => {
+    return !!state.user && !!authService.getToken();
+  };
+
   const value = {
     ...state,
+    isAuthenticated: checkAuthentication(),
     login,
     register,
     logout,
     updateUser,
-    clearError
+    clearError,
+    clearSuccess,
+    clearMessages
   };
 
   return (

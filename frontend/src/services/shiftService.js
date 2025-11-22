@@ -2,8 +2,15 @@ import api from './api';
 
 export const shiftService = {
   async getAllShifts() {
-    const response = await api.get('/shifts');
-    return response.data;
+    try {
+      console.log('ShiftService - Fetching all shifts');
+      const response = await api.get('/shifts');
+      console.log('ShiftService - Received shifts:', response.data.length);
+      return response.data || [];
+    } catch (error) {
+      console.error('ShiftService - Error fetching shifts:', error);
+      return [];
+    }
   },
 
   async getShift(id) {
@@ -12,8 +19,15 @@ export const shiftService = {
   },
 
   async createShift(shiftData) {
-    const response = await api.post('/shifts', shiftData);
-    return response.data;
+    try {
+      console.log('ShiftService - Creating shift:', shiftData);
+      const response = await api.post('/shifts', shiftData);
+      console.log('ShiftService - Shift created successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('ShiftService - Error creating shift:', error);
+      throw error;
+    }
   },
 
   async updateShift(id, shiftData) {

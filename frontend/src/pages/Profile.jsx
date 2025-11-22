@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { SPECIALIZATIONS, ROLES } from '../utils/constants';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import { authService } from '../services/authService';
 
 const Profile = () => {
   const { user, updateUser } = useAuth();
@@ -47,10 +48,8 @@ const Profile = () => {
     setLoading(true);
     
     try {
-      // Here you would typically call an API to update the user
-      // For now, we'll just update the local state
-      const updatedUser = {
-        ...user,
+      // Prepare the data to send to backend
+      const updateData = {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
@@ -63,25 +62,33 @@ const Profile = () => {
       };
 
       if (user.role === ROLES.NURSE) {
-        updatedUser.nurseProfile = {
+        updateData.nurseProfile = {
           ...user.nurseProfile,
           licenseNumber: formData.licenseNumber,
-          experienceYears: parseInt(formData.experienceYears),
+          experienceYears: parseInt(formData.experienceYears) || 0,
           specializations: formData.specializations,
-          hourlyRate: parseFloat(formData.hourlyRate)
+          hourlyRate: parseFloat(formData.hourlyRate) || 0
         };
       } else {
-        updatedUser.hospitalProfile = {
+        updateData.hospitalProfile = {
           ...user.hospitalProfile,
           hospitalType: formData.hospitalType,
           size: formData.size
         };
       }
 
-      updateUser(updatedUser);
+      // Make API call to update profile
+      const updatedUserData = await authService.updateProfile(updateData);
+      
+      // Update local state with the response from backend
+      updateUser(updatedUserData);
       setEditing(false);
+      
+      // Show success message
+      alert('Profile updated successfully!');
     } catch (error) {
       console.error('Error updating profile:', error);
+      alert('Failed to update profile: ' + error.message);
     } finally {
       setLoading(false);
     }

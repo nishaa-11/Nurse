@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { shiftService } from '../services/shiftService';
 import { surgeService } from '../services/surgeService';
@@ -6,6 +7,7 @@ import { DEPARTMENTS, URGENCY_LEVELS, SHIFT_STATUS } from '../utils/constants';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
 const HospitalDashboard = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [shifts, setShifts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,18 +33,35 @@ const HospitalDashboard = () => {
   });
 
   useEffect(() => {
-    loadShifts();
+    if (user?._id) {
+      loadShifts();
+    }
+  }, [user?._id]);
+
+  // Reload shifts when returning to page
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        loadShifts();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
   const loadShifts = async () => {
     try {
       setLoading(true);
+      console.log('HospitalDashboard - Loading shifts for user:', user?._id);
       const shiftsData = await shiftService.getAllShifts();
+      console.log('HospitalDashboard - Received shifts:', shiftsData.length);
       const hospitalShifts = shiftsData.filter(shift => shift.hospital?._id === user._id);
+      console.log('HospitalDashboard - Filtered hospital shifts:', hospitalShifts.length);
       setShifts(hospitalShifts);
       calculateStats(hospitalShifts);
     } catch (error) {
       console.error('Error loading shifts:', error);
+      setShifts([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -135,6 +154,12 @@ const HospitalDashboard = () => {
           </div>
           <div className="flex space-x-4">
             <button
+              onClick={() => { loadShifts(); console.log('Manual refresh triggered'); }}
+              className="px-4 py-2 rounded-lg font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+            >
+              🔄 Refresh
+            </button>
+            <button
               onClick={handleToggleSurge}
               className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                 surgeMode
@@ -146,9 +171,15 @@ const HospitalDashboard = () => {
             </button>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors mr-3"
             >
-              + Create Shift
+              + Quick Create
+            </button>
+            <button
+              onClick={() => navigate('/create-shift')}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+            >
+              + Detailed Create
             </button>
           </div>
         </div>

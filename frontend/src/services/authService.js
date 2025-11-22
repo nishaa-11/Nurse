@@ -47,6 +47,21 @@ export const authService = {
     return response.data;
   },
 
+  async updateProfile(profileData) {
+    try {
+      const response = await api.put('/auth/profile', profileData);
+      
+      // Update localStorage with new user data
+      if (response.data) {
+        localStorage.setItem('user', JSON.stringify(response.data));
+      }
+      
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
   getCurrentUser() {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
@@ -57,6 +72,8 @@ export const authService = {
   },
 
   isAuthenticated() {
-    return !!this.getToken();
+    const token = this.getToken();
+    const user = this.getCurrentUser();
+    return !!token && !!user;
   }
 };
