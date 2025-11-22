@@ -85,11 +85,19 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
+      console.log('AuthContext: Starting registration with data:', userData);
       const user = await authService.register(userData);
+      console.log('AuthContext: Registration successful, user:', user);
       dispatch({ type: 'LOGIN_SUCCESS', payload: user });
       return user;
     } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: error.response?.data?.message || 'Registration failed' });
+      console.error('AuthContext: Registration failed:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
+      dispatch({ type: 'SET_ERROR', payload: errorMessage });
       throw error;
     }
   };

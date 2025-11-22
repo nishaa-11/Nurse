@@ -2,12 +2,29 @@ import api from './api';
 
 export const authService = {
   async register(userData) {
-    const response = await api.post('/auth/register', userData);
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data));
+    try {
+      console.log('AuthService: Sending registration request to:', '/auth/register');
+      console.log('AuthService: Request payload:', JSON.stringify(userData, null, 2));
+      
+      const response = await api.post('/auth/register', userData);
+      
+      console.log('AuthService: Registration response:', response.data);
+      
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data));
+        console.log('AuthService: Token and user data saved to localStorage');
+      }
+      return response.data;
+    } catch (error) {
+      console.error('AuthService: Registration error:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        userData: userData
+      });
+      throw error;
     }
-    return response.data;
   },
 
   async login(credentials) {

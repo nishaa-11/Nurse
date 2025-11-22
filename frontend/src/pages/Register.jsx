@@ -66,7 +66,47 @@ const Register = () => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
-      return; // Handle password mismatch
+      alert('Passwords do not match!');
+      return;
+    }
+
+    // Basic validation
+    console.log('Form data before validation:', formData);
+    
+    if (!formData.name || !formData.email || !formData.password || !formData.role) {
+      alert('Please fill in all required fields.');
+      console.log('Missing basic fields:', {
+        name: !!formData.name,
+        email: !!formData.email, 
+        password: !!formData.password,
+        role: !!formData.role
+      });
+      return;
+    }
+
+    if (formData.role === ROLES.NURSE) {
+      if (!formData.licenseNumber || !formData.experienceYears || !formData.hourlyRate) {
+        alert('Please fill in all nursing professional details.');
+        console.log('Missing nurse fields:', {
+          licenseNumber: !!formData.licenseNumber,
+          experienceYears: !!formData.experienceYears,
+          hourlyRate: !!formData.hourlyRate
+        });
+        return;
+      }
+    } else if (formData.role === ROLES.HOSPITAL) {
+      if (!formData.hospitalType || !formData.size) {
+        alert('Please fill in all hospital facility details.');
+        console.log('Missing hospital fields:', {
+          hospitalType: !!formData.hospitalType,
+          size: !!formData.size,
+          actualValues: {
+            hospitalType: formData.hospitalType,
+            size: formData.size
+          }
+        });
+        return;
+      }
     }
 
     try {
@@ -76,15 +116,20 @@ const Register = () => {
         password: formData.password,
         phone: formData.phone,
         role: formData.role,
-        address: formData.address
+        address: formData.address,
+        // Set location to default coordinates for now
+        location: {
+          type: "Point",
+          coordinates: [0, 0]
+        }
       };
 
       if (formData.role === ROLES.NURSE) {
         userData.nurseProfile = {
           licenseNumber: formData.licenseNumber,
-          experienceYears: parseInt(formData.experienceYears),
+          experienceYears: parseInt(formData.experienceYears) || 0,
           specializations: formData.specializations,
-          hourlyRate: parseFloat(formData.hourlyRate)
+          hourlyRate: parseFloat(formData.hourlyRate) || 0
         };
       } else {
         userData.hospitalProfile = {
@@ -93,9 +138,19 @@ const Register = () => {
         };
       }
 
+      console.log('Sending registration data:', JSON.stringify(userData, null, 2));
       const user = await register(userData);
+      console.log('Registration successful:', user);
+      alert('Registration successful! Welcome to ShiftNow!');
       navigate(user.role === 'nurse' ? '/nurse' : '/hospital');
     } catch (err) {
+      console.error('Registration error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        userData: userData
+      });
+      alert(`Registration failed: ${err.response?.data?.message || err.message || 'Unknown error'}`);
       // Error handled by AuthContext
     }
   };
@@ -368,7 +423,7 @@ const Register = () => {
                   <>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Hospital Type</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Hospital Type *</label>
                         <select
                           name="hospitalType"
                           required
@@ -376,14 +431,14 @@ const Register = () => {
                           value={formData.hospitalType}
                           onChange={handleChange}
                         >
-                          <option value="">Select type</option>
+                          <option value="">Select hospital type</option>
                           {HOSPITAL_TYPES.map((type) => (
                             <option key={type} value={type}>{type}</option>
                           ))}
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Hospital Size</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Hospital Size *</label>
                         <select
                           name="size"
                           required
@@ -391,7 +446,7 @@ const Register = () => {
                           value={formData.size}
                           onChange={handleChange}
                         >
-                          <option value="">Select size</option>
+                          <option value="">Select hospital size</option>
                           {HOSPITAL_SIZES.map((size) => (
                             <option key={size} value={size}>{size}</option>
                           ))}
